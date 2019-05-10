@@ -1,0 +1,25 @@
+.*
+
+# Folder with compiled python modules
+**/__pycache__*
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+apicache-py3*
+
+# Actual config file
+config.yaml
+
+# Actual drop_tables.sql
+drop_tables.sql
+
+# Funny pywikibot files
+pywikibot.lwp
+throttle.ctrl
+
+# Don't ignore this file
+!.gitignore
+
