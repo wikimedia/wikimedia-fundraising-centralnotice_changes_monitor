@@ -1,5 +1,4 @@
 import re
-import pprint
 
 
 def _lines_and_matches( compiled_re, content ):

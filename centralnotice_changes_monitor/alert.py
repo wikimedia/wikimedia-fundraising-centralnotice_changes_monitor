@@ -7,8 +7,10 @@ class AlertType( Enum ):
 
 
 class Alert:
-    def __init__( self, pattern_name, page_title, alert_type, line, match, change = None):
+    def __init__( self, pattern_name, page_title, page_revision, alert_type, line, match,
+        change = None ):
         self.pattern_name = pattern_name
+        self.page_revision = page_revision
         self.page_title = page_title
         self.alert_type = alert_type
         self.line = line
@@ -21,9 +23,10 @@ class Alert:
 
     def output( self ):
         # TODO include change metadata
-        return '{} for page {}, {} on line {}'.format(
+        return '{}: {} (rev. {}): Content {} on line {}'.format(
             self.pattern_name,
             self.page_title,
-            self.alert_type,
+            self.page_revision,
+            self.alert_type.value,
             self.line
         )

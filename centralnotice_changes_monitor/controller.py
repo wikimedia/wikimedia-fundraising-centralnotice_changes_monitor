@@ -40,10 +40,12 @@ def stream_changes( wiki_api_settings, db_settings, alert_pattern_settings ):
     # Check for alerts on changes on both current and past pages to monitor
     pages_for_alerts = pages_to_monitor + removed_pages
     page_monitor.set_changes( pages_for_alerts )
-    alerts = page_monitor.alerts( pages_for_alerts, alert_patterns )
+    alerts = page_monitor.get_alerts_and_update_pages( pages_for_alerts, alert_patterns )
 
+    # Output alerts
     for alert in alerts:
         _logger.warn( alert.output() )
+
     db.close()
 
     return 'Resultsies'

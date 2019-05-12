@@ -7,6 +7,7 @@ Notes:
 - direct manipulation of banners, campaigns only by their respective managers
 - don't use complex objects from pywikibot, not needed
 - controller tells a high-level story
+- no accessing page or campaign instances from listener threads
 """
 
 

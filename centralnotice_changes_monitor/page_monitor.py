@@ -73,7 +73,7 @@ def set_changes( pages ):
             raise ValueError( 'checked_revision and latest_revision are both None' )
 
 
-def alerts( pages, alert_patterns ):
+def get_alerts_and_update_pages( pages, alert_patterns ):
     alerts = []
 
     for page in pages:
@@ -92,6 +92,7 @@ def _make_alerts( page, ptn, lines_and_matches, alert_type ):
     for line_and_matches in lines_and_matches:
         line = line_and_matches[0]
         for m in line_and_matches[1]:
-            alerts.append( Alert( ptn.name, page.title, alert_type, line, m ) )
+            alerts.append( Alert( ptn.name, page.title, page.latest_revision, 
+                alert_type, line, m ) )
     
     return alerts
