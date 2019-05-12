@@ -34,11 +34,11 @@ def stream_changes( wiki_api_settings, db_settings, alert_pattern_settings ):
     # are created, so we fetch that data separately.
     banner_manager.set_latest_revisions( banners )
 
-    # Find and set pages' status and last revision checked and get a list of removed
-    # pages from the db.
+    # Find and set pages' revision checked and status properties with regard to state stored
+    # in the db, and get a list of pages no longer in monitoring.
     removed_pages = page_monitor.set_properties_from_db_and_get_removed( pages_to_monitor )
 
-    # Check for alerts on changes on both current and past pages to monitor
+    # Check for alerts looking at changes in pages to monitor and removed pages
     for page in pages_to_monitor + removed_pages:
         page_monitor.set_changes( page )
         alerts = page_monitor.get_alerts( page, alert_patterns )

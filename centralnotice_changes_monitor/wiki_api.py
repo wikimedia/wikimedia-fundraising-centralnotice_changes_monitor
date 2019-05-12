@@ -1,5 +1,4 @@
 import os
-
 import logging
 
 _logger = logging.getLogger( __name__ )
@@ -111,7 +110,13 @@ def content( page ):
 
 def _title_and_revision_dict( raw_query_data ):
     # Traverse the API results data structure
-    raw_pages = raw_query_data[ 'query' ][ 'pages' ].values()
+    raw_query_el = raw_query_data[ 'query' ]
 
-    # Return a dictionary where keys are titles and values are the latest revision
-    return { p[ 'title' ] : p[ 'revisions' ][ 0 ][ 'revid' ] for p in raw_pages }
+    if 'pages' in raw_query_el:
+        raw_pages = raw_query_el[ 'pages' ].values()
+
+        # Return a dictionary where keys are titles and values are the latest revision
+        return { p[ 'title' ] : p[ 'revisions' ][ 0 ][ 'revid' ] for p in raw_pages }
+
+    else:
+        return {}
