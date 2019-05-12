@@ -23,10 +23,11 @@ class Alert:
 
     def output( self ):
         # TODO include change metadata
-        return '{}: {} (rev. {}): Content {} on line {}'.format(
+        return '**{}** {} (rev. {}). Match: \'{}\'. Line {}: \'{}\''.format(
             self.pattern_name,
             self.page_title,
             self.page_revision,
+            self.match,
             self.alert_type.value,
             self.line
         )

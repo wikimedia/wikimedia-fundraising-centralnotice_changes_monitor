@@ -45,7 +45,7 @@ def stream_changes( wiki_api_settings, db_settings, alert_pattern_settings ):
 
         # Output alerts
         for alert in alerts:
-            _logger.warn( alert.output() )
+            print( alert.output() )
 
         page_monitor.update_page_after_alerts( page )
 
