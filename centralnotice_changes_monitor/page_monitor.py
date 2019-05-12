@@ -1,5 +1,5 @@
 from centralnotice_changes_monitor import db, wiki_api
-from centralnotice_changes_monitor.banner import Page
+from centralnotice_changes_monitor.page import Page, PageStatus
 from centralnotice_changes_monitor.alert import Alert, AlertType
 
 PAGES_TO_MONITOR = 'SELECT title, checked_revision FROM pages_to_monitor'
@@ -38,53 +38,70 @@ def pages_to_monitor( banners, transcluded_pages ):
     return list( pages_by_title.values() )
 
 
-def set_checked_revision_and_get_removed( pages_to_monitor ):
+def set_properties_from_db_and_get_removed( pages_to_monitor ):
     pages_to_monitor_by_title = { p.title : p for p in pages_to_monitor }
     removed_pages = []
+    previously_monitoring_page_titles = []
 
     cursor = db.connection.cursor()
     cursor.execute( PAGES_TO_MONITOR )
 
     for ( title, checked_revision ) in cursor:
+        previously_monitoring_page_titles.append( title )
+
         if title in pages_to_monitor_by_title:
-            pages_to_monitor_by_title[ title ].prev_checked_revision = checked_revision
+            page = pages_to_monitor_by_title[ title ]
+            page.checked_revision = checked_revision
+            page.status = PageStatus.MONITORING
+
         else:
             removed_pages.append( Page( title, None, checked_revision ) )
+            removed_pages.status = PageStatus.REMOVED
+
+    for page in pages_to_monitor:
+        if page.title not in previously_monitoring_page_titles:
+            page.status = PageStatus.NEW
 
     cursor.close()
 
     return removed_pages
 
 
-def set_changes( pages ):
-    for page in pages:
-        if page.prev_checked_revision is None:
-            page.content_added = wiki_api.content( page ).splitlines()
-            page.content_removed = []
+def set_changes( page ):
+    """ Note: Before this function is called, the page's latest_revision and
+    checked_revision properties must be set as appropriate for its status.
+    """
 
-        elif page.latest_revision is None:
-            page.content_added = wiki_api.content( page ).splitlines()
-            page.content_removed = []
+    if page.status == PageStatus.NEW:
+        page.content_added = wiki_api.content( page ).splitlines()
+        page.content_removed = []
 
-        elif ( page.prev_checked_revision is not None ) and ( page.latest_revision is not None ):
-            page.content_added, page.content_removed = wiki_api.compare_latest( page )
+    elif page.status == PageStatus.REMOVED:
+        page.content_added = []
+        page.content_removed = wiki_api.content( page ).splitlines()
 
-        else:
-            raise ValueError( 'checked_revision and latest_revision are both None' )
+    elif page.status == PageStatus.MONITORING:
+        page.content_added, page.content_removed = wiki_api.compare_latest( page )
+
+    else:
+        raise ValueError( 'Incorrect value for page.status: ' + page.status )
 
 
-def get_alerts_and_update_pages( pages, alert_patterns ):
+def get_alerts( page, alert_patterns ):
     alerts = []
 
-    for page in pages:
-        for ptn in alert_patterns:
-            lines_and_matches_added = ptn.lines_and_matches_added( page.content_added )
-            alerts += _make_alerts( page, ptn, lines_and_matches_added, AlertType.ADDED )
+    for ptn in alert_patterns:
+        lines_and_matches_added = ptn.lines_and_matches_added( page.content_added )
+        alerts += _make_alerts( page, ptn, lines_and_matches_added, AlertType.ADDED )
 
-            lines_and_matches_removed = ptn.lines_and_matches_removed( page.content_removed )
-            alerts += _make_alerts( page, ptn, lines_and_matches_removed, AlertType.REMOVED )
+        lines_and_matches_removed = ptn.lines_and_matches_removed( page.content_removed )
+        alerts += _make_alerts( page, ptn, lines_and_matches_removed, AlertType.REMOVED )
 
     return alerts
+
+
+def update_page_after_alerts( page ):
+    page.reset_checked_revision_and_changes( page.latest_revision )
 
 
 def _make_alerts( page, ptn, lines_and_matches, alert_type ):

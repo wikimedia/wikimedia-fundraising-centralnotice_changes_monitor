@@ -99,7 +99,7 @@ def transclusions( pages ):
 def compare_latest( page ):
     from pywikibot import diff
 
-    html_diff = _site.compare( page.prev_checked_revision, page.latest_revision )
+    html_diff = _site.compare( page.checked_revision, page.latest_revision )
     changes = diff.html_comparator( html_diff )
     return changes[ 'added-context' ], changes[ 'deleted-context' ]
 
