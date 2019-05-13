@@ -11,7 +11,7 @@ def campaigns():
             campaign_raw[ 'name' ],
             campaign_raw[ 'start' ],
             campaign_raw[ 'end' ],
-            campaign_raw[ 'banners' ]
+            campaign_raw.get( 'banners', [] )
         )
 
         campaigns.append( campaign )

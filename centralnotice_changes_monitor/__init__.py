@@ -8,6 +8,6 @@ def setup_logging( debug ):
     logging.basicConfig( format = LOG_FORMAT, style = '{' )
 
     if debug:
-        logging.root.setLevel( level = logging.DEBUG ) 
+        logging.root.setLevel( level = logging.INFO )
     else:
         logging.root.setLevel( level = logging.WARNING )

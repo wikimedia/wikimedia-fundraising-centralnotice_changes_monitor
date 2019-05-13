@@ -14,12 +14,6 @@ def from_campaigns( campaigns ):
     return [ Banner( banner_name ) for banner_name in banner_names ]
 
 
-def set_latest_revisions( banners ):
-    latest_revisions = wiki_api.latest_revisions( banners )
-    for banner in banners:
-        banner.latest_revision = latest_revisions[ banner.title ]
-
-
 def transcluded_pages( banners ):
     pages_raw = wiki_api.transclusions( banners )
     return[ Page( title, latest_revsion ) for title, latest_revsion in pages_raw.items() ]

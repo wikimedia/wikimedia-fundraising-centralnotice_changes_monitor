@@ -41,6 +41,12 @@ def pages_to_monitor( banners, transcluded_pages ):
     return list( pages_by_title.values() )
 
 
+def set_latest_revisions( pages ):
+    latest_revisions = wiki_api.latest_revisions( pages )
+    for page in pages:
+        page.latest_revision = latest_revisions[ page.title ]
+
+
 def set_properties_from_db_and_get_removed( pages_to_monitor ):
     pages_to_monitor_by_title = { p.title : p for p in pages_to_monitor }
     removed_pages = []
@@ -123,6 +129,7 @@ def update_page_after_alerts( page ):
             raise e
 
         db.connection.commit()
+        page.status = PageStatus.MONITORING
 
     elif page.status == PageStatus.MONITORING:
 

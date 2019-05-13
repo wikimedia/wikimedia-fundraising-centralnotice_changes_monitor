@@ -51,8 +51,7 @@ if __name__ == '__main__':
         db_settings = cfg[ 'db' ],
         wiki_api_settings = cfg.get( 'wiki', None ),
         kafka_settings = cfg[ 'kafka' ],
-        alert_pattern_settings = cfg[ 'alert_patterns' ],
-        max_queue_size = cfg[ 'max_queue_size' ]
+        alert_pattern_settings = cfg[ 'alert_patterns' ]
     )
 
     print( result )
