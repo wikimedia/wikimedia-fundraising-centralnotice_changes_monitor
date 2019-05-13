@@ -7,7 +7,6 @@ Notes:
 - direct manipulation of banners, campaigns only by their respective managers
 - don't use complex objects from pywikibot, not needed
 - controller tells a high-level story
-- no accessing page or campaign instances from listener threads
 """
 
 
@@ -22,7 +21,9 @@ if __name__ == '__main__':
     # Set up command-line arguments and help
 
     parser = argparse.ArgumentParser(
-        description = 'CentralNotice Changes Monitor: TODO: Usage overview'
+        description = """CentralNotice Changes Monitor. Use configurable alerts to
+            monitor changes to banners and transcluded pages associated with active
+            and upcoming CentralNotice campaigns."""
     )
 
     parser.add_argument(
@@ -47,7 +48,7 @@ if __name__ == '__main__':
     setup_logging( args.debug )
 
     # Call the controller function to stream changes
-    result = controller.stream_changes(
+    result = controller.monitor(
         db_settings = cfg[ 'db' ],
         wiki_api_settings = cfg.get( 'wiki', None ),
         kafka_settings = cfg[ 'kafka' ],

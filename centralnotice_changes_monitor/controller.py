@@ -20,8 +20,7 @@ _UPDATE_PAGES_TO_MONITOR_TOPICS = [
 _logger = logging.getLogger( __name__ )
 
 
-def stream_changes( db_settings, wiki_api_settings, kafka_settings,
-    alert_pattern_settings ):
+def monitor( db_settings, wiki_api_settings, kafka_settings, alert_pattern_settings ):
 
     # Before pywikibot is imported for the first time, we need to set the environment
     # variable that points to its configuration file. We'll also set up which wiki

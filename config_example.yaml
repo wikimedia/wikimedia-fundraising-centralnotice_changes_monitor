@@ -6,7 +6,7 @@ db_settings:
   database: 'centralnotice_changes_monitor'
 
 # CentralNotice infrastructure wiki, to be called via Web API
-# Leave this whole section commented to default to WMF Meta wiki.
+# Leave this entire section commented to default to WMF Meta wiki.
 wiki:
   host: 'localhost:8080'
   scriptpath: '/w'
@@ -16,10 +16,6 @@ kafka:
   datacenter: 'datacenter1'
   hosts:
     - '127.0.0.1:9092'
-
-# Maximum size for python queues. If the size limit is reached, we emit a warning
-# and block processing.
-max_queue_size: 50
 
 # Changes to emit alerts on
 alert_patterns:
