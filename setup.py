@@ -8,6 +8,8 @@ setup( name = 'centralnotice_changes_monitor',
     packages = [ 'centralnotice_changes_monitor' ],
     install_requires = [
         'pywikibot >= 3.0',
-        'mysql-connector-python >= 1.2.3'
+        'mysql-connector-python >= 1.2.3',
+        'kafka-python >= 1.4.6',
+        'bs4 >= 0.0.1'
     ]
 )

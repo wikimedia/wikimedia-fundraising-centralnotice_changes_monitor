@@ -11,6 +11,16 @@ wiki:
   host: 'localhost:8080'
   scriptpath: '/w'
 
+# Kafka setup, for listenting for changes
+kafka:
+  datacenter: 'datacenter1'
+  hosts:
+    - '127.0.0.1:9092'
+
+# Maximum size for python queues. If the size limit is reached, we emit a warning
+# and block processing.
+max_queue_size: 50
+
 # Changes to emit alerts on
 alert_patterns:
   - name: 'Added or removed links'

@@ -1,14 +1,17 @@
 import logging
+from queue import Queue
+from threading import Thread
 
 from centralnotice_changes_monitor import ( wiki_api, db, campaign_manager, banner_manager,
-    page_manager )
+    page_manager, kafka_consumer )
 
 from centralnotice_changes_monitor.alert_pattern import AlertPattern
 
 _logger = logging.getLogger( __name__ )
 
 
-def stream_changes( wiki_api_settings, db_settings, alert_pattern_settings ):
+def stream_changes( db_settings, wiki_api_settings, kafka_settings, alert_pattern_settings,
+    max_queue_size ):
     _logger.debug( 'Fetching camapigns' )
 
     # Before pywikibot is imported for the first time, we need to set the environment
@@ -22,7 +25,20 @@ def stream_changes( wiki_api_settings, db_settings, alert_pattern_settings ):
     # Create alert pattern objects
     alert_patterns = [ AlertPattern( **settings ) for settings in alert_pattern_settings ]
 
-    # Start and connect campaign changes monitor and content monitor but on hold
+    # Queue for events that trigger the controller to update the pages to monitor
+    event_queue = Queue( max_queue_size )
+
+    # Queue to send new lists of pages to monitor to the kafka consumer
+    update_pages_to_monitor_queue = Queue( max_queue_size )
+
+    # Start and connect kafka consumer
+    kafka_consumer_thread = Thread(
+        target = kafka_consumer.consume,
+        args = ( event_queue, update_pages_to_monitor_queue, kafka_settings ),
+        daemon = True
+    )
+
+    kafka_consumer_thread.start()
 
     # Get initial state of campaigns and banners and list of pages to monitor
     campaigns = campaign_manager.campaigns()
@@ -48,6 +64,10 @@ def stream_changes( wiki_api_settings, db_settings, alert_pattern_settings ):
             print( alert.output() )
 
         page_manager.update_page_after_alerts( page )
+
+
+    while True:
+        pass
 
     db.close()
 

@@ -48,9 +48,11 @@ if __name__ == '__main__':
 
     # Call the controller function to stream changes
     result = controller.stream_changes(
-        wiki_api_settings = cfg.get( 'wiki', None ),
         db_settings = cfg[ 'db' ],
-        alert_pattern_settings = cfg[ 'alert_patterns' ]
+        wiki_api_settings = cfg.get( 'wiki', None ),
+        kafka_settings = cfg[ 'kafka' ],
+        alert_pattern_settings = cfg[ 'alert_patterns' ],
+        max_queue_size = cfg[ 'max_queue_size' ]
     )
 
     print( result )
