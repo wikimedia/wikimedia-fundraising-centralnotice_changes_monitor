@@ -21,6 +21,7 @@ _logger = logging.getLogger( __name__ )
 
 
 def monitor( db_settings, wiki_api_settings, kafka_settings, alert_pattern_settings ):
+    """Main monitoring loop."""
 
     # Before pywikibot is imported for the first time, we need to set the environment
     # variable that points to its configuration file. We'll also set up which wiki
@@ -35,7 +36,7 @@ def monitor( db_settings, wiki_api_settings, kafka_settings, alert_pattern_setti
     # Open db connection
     db.connect( **db_settings )
 
-    # Since the script shouldn't stop running unless interrupted or there's an error,
+    # Since the script shouldn't stop running unless interrupted or an error occurs,
     # ensure that in those cases we close the db connection.
     try:
         # Create alert pattern objects
@@ -50,7 +51,7 @@ def monitor( db_settings, wiki_api_settings, kafka_settings, alert_pattern_setti
                 event = json.loads( message.value )
 
             except json.JSONDecodeError:
-                _logger.info( 'Couldn\t decode message from Kafka stream: ' + message.value )
+                _logger.info( 'Couldn\t decode message from Kafka: ' + message.value )
                 continue
 
             topic = event[ 'meta' ][ 'topic' ]
@@ -74,6 +75,7 @@ def monitor( db_settings, wiki_api_settings, kafka_settings, alert_pattern_setti
 
 
 def _kafka_consumer( kafka_settings ):
+    """Instantiate the KafkaConsumer object"""
     topics = ( [ _PAGE_EDIT_TOPIC ] + _UPDATE_PAGES_TO_MONITOR_TOPICS )
 
     # Tópic names sent to Kafka must include datacenter
@@ -91,6 +93,10 @@ def _kafka_consumer( kafka_settings ):
 
 
 def _update_pages_to_monitor_and_emit_alerts( alert_patterns ):
+    """Find all the pages to monitor. Find the latest revision of each of those pages.
+    Compare it to the latest revision checked, according to the database. Emit alerts
+    as per alert patterns."""
+
     # Get state of campaigns and banners and list of pages to monitor
     campaigns = campaign_manager.campaigns()
     banners = banner_manager.from_campaigns( campaigns )
@@ -113,6 +119,9 @@ def _update_pages_to_monitor_and_emit_alerts( alert_patterns ):
 
 
 def _check_patterns_emit_alerts_and_update_page( page, alert_patterns ):
+    """Check alert patterns on content added and removed in this page, and emit alerts
+    as needed."""
+
     page_manager.set_changes( page )
     alerts = page_manager.get_alerts( page, alert_patterns )
 

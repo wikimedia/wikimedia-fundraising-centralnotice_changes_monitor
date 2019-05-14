@@ -4,6 +4,9 @@
 Use configurable alerts to monitor changes to banners and transcluded pages associated
 with active and upcoming CentralNotice campaigns.
 
+The script stores the last revisions checked in a database. When re-started, it checks
+changes in content since the last time it was run.
+
 # Usage
 
 Copy `config-example.yaml` to `config.yaml` and adjust settings as appropriate.

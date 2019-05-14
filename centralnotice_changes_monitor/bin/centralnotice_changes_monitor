@@ -1,14 +1,16 @@
 #!/usr/bin/python3
 """CentralNotice changes monitor
-TODO: Overview of code layout
-Notes: 
-- no state (other than config/setup) outside controller
-- no wiki api calls outside wiki_api
-- direct manipulation of banners, campaigns only by their respective managers
-- don't use complex objects from pywikibot, not needed
-- controller tells a high-level story
-"""
+Code layout notes: This script sets up and parses command-line arguments, gets
+configuration from the config module, and calls the public controller function. No other
+code in this library should deal directly with command-line arguments or config.
 
+Notes on some modules:
+controller       Manages process from a high level and keeps all global state (other than
+                 setup information).
+wiki_api         Handles all calls to the wiki's public web-based API.
+page_manager     Handles all database interactions and provides methods for working with
+                 pages.
+"""
 
 import argparse
 
@@ -23,7 +25,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description = """CentralNotice Changes Monitor. Use configurable alerts to
             monitor changes to banners and transcluded pages associated with active
-            and upcoming CentralNotice campaigns."""
+            and upcoming CentralNotice campaigns. Stores the last revisions checked
+            in a database. When re-started, checks changes in content since the last
+            time it was run."""
     )
 
     parser.add_argument(
@@ -48,11 +52,9 @@ if __name__ == '__main__':
     setup_logging( args.debug )
 
     # Call the controller function to stream changes
-    result = controller.monitor(
+    controller.monitor(
         db_settings = cfg[ 'db' ],
         wiki_api_settings = cfg.get( 'wiki', None ),
         kafka_settings = cfg[ 'kafka' ],
         alert_pattern_settings = cfg[ 'alert_patterns' ]
     )
-
-    print( result )

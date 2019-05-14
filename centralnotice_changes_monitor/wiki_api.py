@@ -6,9 +6,12 @@ _logger = logging.getLogger( __name__ )
 _site = None
 
 def init( host = None, scriptpath = None ):
+    """Initial setup. Tell pywikibot where its config file is before we import it, and
+    create a wiki family if a host is provided. (Otherwise, queries default to WMF's
+    Metawiki.)"""
     global _site
 
-    # This must be set before we use pywikibot
+    # This must be set before we import pywikibot
     os.environ[ 'PYWIKIBOT2_DIR' ] = '.'
     from pywikibot import Site
 

@@ -29,10 +29,10 @@ REMOVE_PAGE_TO_MONITOR = 'DELETE FROM pages_to_monitor WHERE title = %s'
 
 
 def pages_to_monitor( banners, transcluded_pages ):
+    """Merge the lists provided, ensuring only unique pages by title, since, in theory,
+    a banner could transclude another banner, so there could be separate objects for the
+    same actual page."""
 
-    # Merge the lists ensuring only unique pages by title, since, in theory, a banner
-    # could transclude another banner, so there could be separate objects for the same
-    # actual page.
     pages_by_title = {}
 
     for page in ( banners + transcluded_pages ):
@@ -42,12 +42,18 @@ def pages_to_monitor( banners, transcluded_pages ):
 
 
 def set_latest_revisions( pages ):
+    """Get the latest revision number of pages, and set their corresponding property."""
+
     latest_revisions = wiki_api.latest_revisions( pages )
     for page in pages:
         page.latest_revision = latest_revisions[ page.title ]
 
 
 def set_properties_from_db_and_get_removed( pages_to_monitor ):
+    """Query the database to find the last revision checked for each page, and also
+    determine if the page is new in the list of pages to monitor, or was already being
+    monitored. Return a list of pages that have been removed from monitoring status."""
+
     pages_to_monitor_by_title = { p.title : p for p in pages_to_monitor }
     removed_pages = []
     previously_monitoring_page_titles = []
@@ -78,9 +84,9 @@ def set_properties_from_db_and_get_removed( pages_to_monitor ):
 
 
 def set_changes( page ):
-    """ Note: Before this function is called, the page's latest_revision and
-    checked_revision properties must be set as appropriate for its status.
-    """
+    """Set the page's content_added and content_removed properties by querying the wiki
+    API. Note: Before this function is called, the page's latest_revision and
+    checked_revision properties must be set as appropriate for its status."""''
 
     if page.status == PageStatus.NEW:
         page.content_added = wiki_api.content( page ).splitlines()
@@ -102,6 +108,8 @@ def set_changes( page ):
 
 
 def get_alerts( page, alert_patterns ):
+    """Return alerts for this page based on changes indicated in the page properties
+    and the provided alert patterns."""
     alerts = []
 
     for ptn in alert_patterns:
@@ -115,7 +123,8 @@ def get_alerts( page, alert_patterns ):
 
 
 def update_page_after_alerts( page ):
-
+    """Update the database and page properties (status and content chnages) after
+    it has been checked against alert patterns."""
     page.reset_checked_revision_and_changes( page.latest_revision )
     cursor = db.connection.cursor()
 

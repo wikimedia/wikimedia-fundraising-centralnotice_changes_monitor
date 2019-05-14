@@ -18,6 +18,8 @@ class Alert:
 
         # Change data may not be available if diff from changes between the prevoius
         # and current execution of this script.
+        # TODO Currently unused, left as a placeholder. Change data would allow us to
+        # monitor based on the user(s) that performed a change.
         self.change = change
 
 
