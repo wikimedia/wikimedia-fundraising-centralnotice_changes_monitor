@@ -48,6 +48,7 @@ def monitor( db_settings, wiki_api_settings, kafka_settings, alert_pattern_setti
         for message in kafka_consumer:
             try:
                 event = json.loads( message.value )
+
             except json.JSONDecodeError:
                 _logger.info( 'Couldn\t decode message from Kafka stream: ' + message.value )
                 continue
@@ -55,15 +56,16 @@ def monitor( db_settings, wiki_api_settings, kafka_settings, alert_pattern_setti
             topic = event[ 'meta' ][ 'topic' ]
 
             if topic == _PAGE_EDIT_TOPIC:
-                title= event[ 'title' ]
-                _logger.info( 'Checking alerts on change to ' + title )
+                title = event[ 'title' ]
+
                 if title in pages_to_monitor.keys():
-                    page = pages_to_monitor[ title ]
-                    page_manager.set_latest_revisions( ( page, ) )
-                    _check_patterns_emit_alerts_and_update_page( page, alert_patterns )
+                    _logger.info( 'Checking alerts following change to ' + title )
+
+                    pages_to_monitor = (
+                        _update_pages_to_monitor_and_emit_alerts( alert_patterns ) )
 
             else:
-                _logger.info( 'Updating pages to monitor' )
+                _logger.info( 'Checking alerts following event: ' + topic )
                 pages_to_monitor = _update_pages_to_monitor_and_emit_alerts( alert_patterns )
 
     finally:
