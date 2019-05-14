@@ -87,7 +87,11 @@ def set_changes( page ):
         page.content_removed = []
 
     elif page.status == PageStatus.MONITORING:
-        page.content_added, page.content_removed = wiki_api.compare_latest( page )
+        if page.checked_revision == page.latest_revision:
+            page.content_added, page.content_removed = [], []
+
+        else:
+            page.content_added, page.content_removed = wiki_api.compare_latest( page )
 
     elif page.status == PageStatus.REMOVED:
         page.content_added = []
