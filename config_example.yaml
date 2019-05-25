@@ -1,5 +1,5 @@
 # Database settings
-db_settings:
+db:
   user: 'cn_changes_monitor'
   password: 'cn_changes_monitor_pw'
   host: 'localhost'
