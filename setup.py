@@ -7,6 +7,7 @@ setup( name = 'centralnotice_changes_monitor',
     license = 'GPL',
     packages = [ 'centralnotice_changes_monitor' ],
     install_requires = [
+        'pyyaml >= 3.11',
         'pywikibot >= 3.0',
         'mysql-connector-python >= 1.2.3',
         'kafka-python >= 1.4.6',
